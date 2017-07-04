@@ -1,4 +1,6 @@
-import requests
+import requests,urllib
+# requests for making request to fetch the data
+# urllib for downloading post/media
 
 # APP_ACCESS_TOKEN & BASE URL in caps because we make them highlighted so that no other user will chnage
 
@@ -9,12 +11,12 @@ APP_ACCESS_TOKEN='4524609704.a74c90c.aab5743274734c15920c5d78fee925a2'
 BASE_URL='https://api.instagram.com/v1/'
 
 # function to get own information and function name: self_information()
+
+
 def self_information():
   request_url = (BASE_URL + 'users/self/?access_token=%s') % (APP_ACCESS_TOKEN)
   print 'GET request url : %s' % (request_url)
-
-  # it will convert data in json format by .json()
-  user_information = requests.get(request_url).json()
+  user_information = requests.get(request_url).json()         # it will convert data in json format by .json()
   print user_information
 
   # if else loop to check whether there is user exist or not and if not then it will show 200 error
@@ -59,7 +61,7 @@ def get_user_information(insta_username):
   user_information = requests.get(request_url).json()
 
   if user_information['meta']['code'] == 200:
-    if len(user_info['data']):
+    if len(user_information['data']):
       print 'Username: %s' % (user_information['data']['username'])
       print 'No. of followers: %s' % (user_information['data']['counts']['followed_by'])
       print 'No. of people you are following: %s' % (user_information['data']['counts']['follows'])
@@ -72,3 +74,5 @@ def get_user_information(insta_username):
 
 # calling self_information function
 self_information()
+get_user_id('insta.mriu.test.0')
+get_user_information('insta.mriu.test.0')
