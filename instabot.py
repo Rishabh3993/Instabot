@@ -179,7 +179,31 @@ def like_post(insta_username):
 
 
 #------------------------------------------------------------------------------------------------------------------
-#def get_comment_list():
+def get_comment_list(insta_username):
+  media_id = get_follower_post_id(insta_username)
+  print media_id
+  if media_id == None:
+    print 'User does not exist!'
+    exit()
+  request_url = (BASE_URL + 'media/%s/comments?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+  print 'GET request url : %s' % (request_url)
+  user_like_list = requests.get(request_url).json()
+  print user_like_list
+
+  if user_like_list['meta']['code'] == 200:
+    if len(user_like_list['data']):
+      print 'Comment: %s' % (user_like_list['data'][0]['text'])
+      print 'Username: %s' % (user_like_list['data'][0]['from']['username'])
+      print 'Name: %s' % (user_like_list['data'][0]['from']['full_name'])
+
+
+    else:
+      print 'There are no likes on this post!'
+
+  else:
+    print 'Status code other than 200 received!'
+
+
 #------------------------------------------------------------------------------------------------------------------
 
 
