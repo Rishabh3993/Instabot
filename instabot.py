@@ -150,16 +150,16 @@ def get_like_list(insta_username):
 
   if user_like_list['meta']['code'] == 200:
     if len(user_like_list['data']):
-      print 'Username: %s' % (user_like_list['data']['username'])
-      print 'First Name: %s' % (user_like_list['data']['first_name'])
-      print 'Last Name: %s' % (user_like_list['data']['last_name'])
+      print 'Username: %s' % (user_like_list['data'][0]['username'])
+      print 'Name: %s' % (user_like_list['data'][0]['full_name'])
+
 
     else:
       print 'There are no likes on this post!'
 
   else:
     print 'Status code other than 200 received!'
-    
+
 
 
 
