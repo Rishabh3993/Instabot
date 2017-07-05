@@ -1,6 +1,9 @@
 import requests,urllib
 # requests for making request to fetch the data ,urllib for downloading post/media
 
+from textblob import TextBlob
+from textblob.sentiments import NaiveBayesAnalyzer
+
 # APP_ACCESS_TOKEN & BASE URL in caps because we make them highlighted so that no other user will chnage
 global APP_ACCESS_TOKEN , BASE_URL
 APP_ACCESS_TOKEN='4524609704.a74c90c.aab5743274734c15920c5d78fee925a2'
