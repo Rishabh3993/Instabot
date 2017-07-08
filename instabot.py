@@ -106,6 +106,7 @@ def get_own_post():
 
 def get_follower_user_post(insta_username):
   user_id = get_follower_user_id(insta_username)
+
   if user_id == None:
     print 'User does not exist!'
     exit()
@@ -118,6 +119,7 @@ def get_follower_user_post(insta_username):
       image_name = user_media['data'][0]['id'] + '.jpeg'
       image_url = user_media['data'][0]['images']['standard_resolution']['url']
       urllib.urlretrieve(image_url, image_name)
+      print user_media['data'][0]['caption']
       print 'Your image has been downloaded!'
     else:
       print 'There is no post available!'
@@ -130,6 +132,7 @@ def get_follower_user_post(insta_username):
 
 def get_follower_post_id(insta_username):
   user_id = get_follower_user_id(insta_username)
+
   if user_id == None:
     print 'User does not exist!'
     exit()
@@ -139,6 +142,7 @@ def get_follower_post_id(insta_username):
 
   if user_media['meta']['code'] == 200:
     if len(user_media['data']):
+
       return user_media['data'][0]['id']
     else:
       print 'There is no recent post of the user!'
@@ -165,9 +169,14 @@ def get_like_list(insta_username):
 
   if user_like_list['meta']['code'] == 200:
     if len(user_like_list['data']):
-      print 'Username: %s' % (user_like_list['data'][0]['username'])
-      print 'Name: %s' % (user_like_list['data'][0]['full_name'])
-
+        length=len(user_like_list['data'])
+        i=0
+        print 'Number of likes you have: %s'%(length)
+        while(length):
+            print 'Username :%d. %s' % (i+1,user_like_list['data'][i]['username'])
+            print 'Name :%d. %s' % (i+1,user_like_list['data'][i]['full_name'])
+            i=i+1
+            length=length-1
 
     else:
       print 'There are no likes on this post!'
@@ -181,6 +190,8 @@ def get_like_list(insta_username):
 
 def like_post(insta_username):
   media_id = get_follower_post_id(insta_username)
+
+  print media_id
   request_url = (BASE_URL + 'media/%s/likes') % (media_id)
   payload = {"access_token": APP_ACCESS_TOKEN}
   print 'POST request url : %s' % (request_url)
@@ -203,14 +214,22 @@ def get_comment_list(insta_username):
     exit()
   request_url = (BASE_URL + 'media/%s/comments?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
   print 'GET request url : %s' % (request_url)
-  user_like_list = requests.get(request_url).json()
-  print user_like_list
+  user_comment_list = requests.get(request_url).json()
+  print user_comment_list
 
-  if user_like_list['meta']['code'] == 200:
-    if len(user_like_list['data']):
-      print 'Comment: %s' % (user_like_list['data'][0]['text'])
-      print 'Username: %s' % (user_like_list['data'][0]['from']['username'])
-      print 'Name: %s' % (user_like_list['data'][0]['from']['full_name'])
+  if user_comment_list['meta']['code'] == 200:
+    if len(user_comment_list['data']):
+        if len(user_comment_list['data']):
+            length = len(user_comment_list['data'])
+            i = 0
+            print 'Number of likes you have: %s' % (length)
+            while (length):
+                print 'Comment:%d. %s' % (i+1,user_comment_list['data'][i]['text'])
+                print 'Username:%d. %s' % (i+1,user_comment_list['data'][i]['from']['username'])
+                print 'Name:%d. %s' % (i+1,user_comment_list['data'][i]['from']['full_name'])
+                i = i + 1
+                length = length - 1
+
       #comment_list=[user_like_list['data'][0]['text'],user_like_list['data'][0]['from']['username'],user_like_list['data'][0]['from']['full_name']]
       #print comment_list
 
@@ -275,6 +294,49 @@ def negative_comment_delete(insta_username):
 
 
 # ----------------------------------------------------------------------------------------------------------------
+# https://api.instagram.com/v1/locations/search?lat=48.858844&lng=2.294351&access_token=ACCESS-TOKEN
+# https://api.instagram.com/v1/locations/{location-id}/media/recent?access_token=ACCESS-TOKEN
+# https://api.instagram.com/v1/media/search?lat=48.858844&lng=2.294351&access_token=ACCESS-TOKEN
+
+def media_found(latitude,longitude):
+
+    if latitude == "" or longitude == "":
+        print "enter valid latitude and longitute"
+        exit()
+
+    else:
+        request_url=BASE_URL+'media/search?lat=%s&lng=%s&access_token=%s' %(latitude,longitude,APP_ACCESS_TOKEN)
+        media_info = requests.get(request_url).json()
+        if media_info['meta']['code']==200:
+            length = len(media_info['data'])
+            if len(media_info['data']):
+                i=0
+                k=0
+                length=len(media_info['data'])
+                while(length):
+                    if media_info['data'][i]['type']=="image" and ( media_info['data'][i]['caption']['text']=="flood" or media_info['data'][i]['caption']['text']=="earthquake" or media_info['data'][i]['caption']['text']=="tornado" or media_info['data'][i]['caption']['text']=="volcano" or media_info['data'][i]['caption']['text']=="disaster" or media_info['data'][i]['caption']['text']=="clamity"):
+                        image_name = media_info['data'][i]['id'] + '.jpeg'
+                        image_url = media_info['data'][i]['images']['standard_resolution']['url']
+                        urllib.urlretrieve(image_url, image_name)
+                        print 'Your image has been downloaded! and image id is %s' % (media_info['data'][0]['id'])
+                        k=k+1
+                    else:
+                        print "No image of calamity is found"
+                    length=length-1
+                    i=i+1
+                print "total no image found=%s" %(k)
+
+            else:
+                print "No media found in the searched location"
+
+        else:
+            print 'Status code other than 200 received!'
+
+
+#28.1487
+#77.3320
+
+# ----------------------------------------------------------------------------------------------------------------
 # function to start the bot
 
 def bot_start():
@@ -291,32 +353,38 @@ def bot_start():
         print '7.Get a list of comments on the recent post of a user(follower)\n'
         print '8.Write a comment on the recent post of a user(follower)\n'
         print '9.Delete negative comments from the recent post of a user(follower)\n'
-        print '10.Exit'
+        print '10.To predict image using latitude and longitude \n'
+        print '11.Exit \n'
+
+        # ---------------------------------------------------------------------------------
 
         choice = raw_input('Enter you choice: ')
         if choice == '1':
             self_information()
         elif choice == '2':
             insta_username = raw_input('Enter the username of the user: ')
-            get_follower_user_information(insta_username)
+            if insta_username=='':
+                print "Enter valid username"
+            else:
+                get_follower_user_information(insta_username)
             # ---------------------------------------------------------------------------------
             # sub menu
-            while True:
-                print insta_username+'\n'
-                print 'Please choose what you want to do with :'+insta_username+'\n'
-                print 'a. Like the post'
-                print 'b. Comment on post'
-                print 'c. Go to main menu'
+                while True:
+                    print insta_username+'\n'
+                    print 'Please choose what you want to do with :'+insta_username+'\n'
+                    print 'a. Like the post'
+                    print 'b. Comment on post'
+                    print 'c. Go to main menu'
 
-                choice_sub_menu=raw_input('Enter your choice:')
-                if choice_sub_menu=='a':
-                    like_post(insta_username)
-                elif choice_sub_menu=='b':
-                    post_comment(insta_username)
-                elif choice_sub_menu=='c':
-                    bot_start()
-                else:
-                    exit()
+                    choice_sub_menu=raw_input('Enter your choice:')
+                    if choice_sub_menu=='a':
+                        like_post(insta_username)
+                    elif choice_sub_menu=='b':
+                        post_comment(insta_username)
+                    elif choice_sub_menu=='c':
+                        bot_start()
+                    else:
+                        exit()
             # -------------------------------------------------------------------------------------
 
 
@@ -324,23 +392,47 @@ def bot_start():
             get_own_post()
         elif choice == '4':
             insta_username = raw_input('Enter the username of the user: ')
-            get_follower_user_post(insta_username)
+            if insta_username=='':
+                print "Enter valid username"
+            else:
+                get_follower_user_post(insta_username)
         elif choice=='5':
            insta_username = raw_input('Enter the username of the user: ')
-           get_like_list(insta_username)
+           if insta_username=='':
+               print "Enter valid username"
+           else:
+               get_like_list(insta_username)
         elif choice=='6':
            insta_username = raw_input('Enter the username of the user: ')
-           like_post(insta_username)
+           if insta_username=='':
+               print "Enter valid username"
+           else:
+               like_post(insta_username)
         elif choice=='7':
            insta_username = raw_input('Enter the username of the user: ')
-           get_comment_list(insta_username)
+           if insta_username=='':
+               print "Enter valid username"
+           else:
+               get_comment_list(insta_username)
         elif choice=='8':
            insta_username = raw_input('Enter the username of the user: ')
-           post_comment(insta_username)
+           if insta_username=='':
+               print "Enter valid username"
+           else:
+               post_comment(insta_username)
         elif choice=='9':
            insta_username = raw_input('Enter the username of the user: ')
-           negative_comment_delete(insta_username)
-        elif choice == '10':
+           if insta_username=='':
+               print "Enter valid username"
+           else:
+               negative_comment_delete(insta_username)
+
+        elif choice=='10':
+            latitude = (raw_input('Please enter the latitude :'))
+            longitude = (raw_input('Please enter the longitude :'))
+            media_found(latitude,longitude)
+
+        elif choice == '11':
             exit()
         else:
             print 'Please choose correct option'
