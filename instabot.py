@@ -314,7 +314,7 @@ def media_found(latitude,longitude):
                 k=0
                 length=len(media_info['data'])
                 while(length):
-                    if media_info['data'][i]['type']=="image" and ( media_info['data'][i]['caption']['text']=="flood" or media_info['data'][i]['caption']['text']=="earthquake" or media_info['data'][i]['caption']['text']=="tornado" or media_info['data'][i]['caption']['text']=="volcano" or media_info['data'][i]['caption']['text']=="disaster" or media_info['data'][i]['caption']['text']=="clamity"):
+                    if media_info['data'][i]['type']=="image" and ( media_info['data'][i]['caption']['text']=="flood" or media_info['data'][i]['caption']['text']=="earthquake" ):
                         image_name = media_info['data'][i]['id'] + '.jpeg'
                         image_url = media_info['data'][i]['images']['standard_resolution']['url']
                         urllib.urlretrieve(image_url, image_name)
